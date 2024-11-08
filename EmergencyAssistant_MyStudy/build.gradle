@@ -1,0 +1,67 @@
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'org.springframework.boot' version '3.3.5'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'com.diffplug.spotless' version '6.25.0' // 컨벤션이 지켜지지 않을 경우 build fail
+}
+
+allprojects { // 모든 모듈에 적용할 gradle script
+    repositories { // 리포지토리 지정
+        mavenCentral() // 메이븐의 기본 리포지토리로 설정
+    }
+}
+
+subprojects { // 서브 모듈만을 위한 gradle script
+    group = 'com.example'
+    version = '0.0.1'
+    sourceCompatibility = '17' //  Java 버전과 일치하는 값으로 컴파일에서 사용하는 JDK 버전 17로 고정
+
+    apply {
+        plugin('java')
+        plugin('java-library')
+        plugin('org.springframework.boot')
+        plugin('io.spring.dependency-management')
+        plugin('com.diffplug.spotless') // 하위 모듈들은 모두 컨벤션이 지켜지지 않으면 fail google Style 적용
+    }
+
+    configurations { // 의존성이 사용되는 범위를 정의
+        compileOnly{
+            extendsFrom annotationProcessor // 컴파일 단계에서 Annotation에 정의된 일렬의 프로세스를 동작하게 함
+        }
+    }
+
+    repositories {
+        mavenCentral()
+        maven {  url 'https://repo.spring.io/milestone' }
+    }
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    test{
+        useJUnitPlatform()
+    }
+
+    spotless { //java 소스 코드 자동 포맷팅
+        java {
+            googleJavaFormat().aosp()
+            importOrder('java', 'javax', 'jakarta', 'org', 'lombok', 'com') //import 순서 지정
+            removeUnusedImports() // 사용하지 않는 import문 자동 제거
+            trimTrailingWhitespace() // 각 라인의 끝에 불필요한 공백 제거
+            endWithNewline() // 마지막에 새로운 줄 추가
+        }
+    }
+}
+
+bootJar.enabled = false
+
+tasks.register("addGitPreCommitHook", Copy) {
+    from 'script/pre-commit'
+    into '.git/hooks'
+}
