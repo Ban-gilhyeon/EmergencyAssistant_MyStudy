@@ -1,10 +1,10 @@
-package com.example.eaapplication;
+package com.example.emergencyassistant_mystudy;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EaApplicationTests {
+class EmergencyAssistantMyStudyApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -1,2 +1,4 @@
 rootProject.name = 'EmergencyAssistant_MyStudy'
-include 'ea-application'
+
+include('ea-application')
+include('ea-application:app-api')
